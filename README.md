@@ -48,4 +48,4 @@ Import app code with `@/`. Do not read `process.env` outside `src/env/server.ts`
 
 `.env.example` lists the variables. `src/env/server.ts` validates them at startup. Add a key there and in `.env.example` together.
 
-Auth and middleware are not part of this template yet.
+Auth screens, session cookie, and `src/proxy.ts` guard `/dashboard` and `/admin`. With `API_URL` empty, `admin@example.com` is the admin fixture and any other email is a user. Set `API_URL` when a real API exists.
