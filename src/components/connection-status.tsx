@@ -1,39 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 import { toast } from "sonner";
 
+function subscribe(onStoreChange: () => void) {
+  window.addEventListener("online", onStoreChange);
+  window.addEventListener("offline", onStoreChange);
+  return () => {
+    window.removeEventListener("online", onStoreChange);
+    window.removeEventListener("offline", onStoreChange);
+  };
+}
+
+function onlineSnapshot() {
+  return navigator.onLine;
+}
+
+function onlineServerSnapshot() {
+  return true;
+}
+
 export function ConnectionStatus() {
-  const [offline, setOffline] = useState(false);
+  const online = useSyncExternalStore(
+    subscribe,
+    onlineSnapshot,
+    onlineServerSnapshot
+  );
+  const wasOffline = useRef(false);
 
   useEffect(() => {
-    let wasOffline = !navigator.onLine;
-    setOffline(wasOffline);
-
-    function onOffline() {
-      wasOffline = true;
-      setOffline(true);
+    if (!online) {
+      wasOffline.current = true;
+      return;
     }
-
-    function onOnline() {
-      setOffline(false);
-      if (wasOffline) {
-        wasOffline = false;
-        toast.success("Back online");
-      }
+    if (wasOffline.current) {
+      wasOffline.current = false;
+      toast.success("Back online");
     }
+  }, [online]);
 
-    window.addEventListener("offline", onOffline);
-    window.addEventListener("online", onOnline);
-
-    return () => {
-      window.removeEventListener("offline", onOffline);
-      window.removeEventListener("online", onOnline);
-    };
-  }, []);
-
-  if (!offline) {
+  if (online) {
     return null;
   }
 

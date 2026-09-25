@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "check-types": "tsc --pretty --noEmit",
-    "check": "yarn check-types && yarn check-format && yarn lint && yarn build",
+    "check": "yarn check-types && yarn check-format && yarn lint && yarn test && yarn build",
+    "test": "vitest run",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -61,7 +62,9 @@
     "prettier": "^3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.1"
   },
   "packageManager": "yarn@4.9.3"
 }
