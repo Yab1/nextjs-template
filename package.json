@@ -17,6 +17,7 @@
     "check-types": "tsc --pretty --noEmit",
     "check": "yarn check-types && yarn check-format && yarn lint && yarn test && yarn build",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^20",

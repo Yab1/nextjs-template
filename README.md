@@ -25,6 +25,7 @@ Node `>=20.14.0` and Yarn 4. `engine-strict` rejects npm and pnpm.
 | `yarn check-format` | Prettier check                                   |
 | `yarn check-types`  | `tsc --noEmit`                                   |
 | `yarn test`         | Vitest                                           |
+| `yarn test:e2e`     | Playwright smoke test. Run `yarn build` first. Uses port 3001. |
 | `yarn check`        | Types, format, lint, tests, and production build |
 | `yarn build`        | Production build                                 |
 
@@ -36,7 +37,11 @@ Node `>=20.14.0` and Yarn 4. `engine-strict` rejects npm and pnpm.
 
 ## CI
 
-`.github/workflows/ci.yml` runs `yarn check` on every push and pull request to `main`. Require that workflow before merging. Jenkins (`deploy/Jenkinsfile`) only deploys.
+`.github/workflows/ci.yml` runs `yarn check`, then the Playwright smoke test, on every push and pull request to `main`. Require that workflow before merging. Jenkins (`deploy/Jenkinsfile`) only deploys.
+
+Dependabot (`.github/dependabot.yml`) opens a weekly pull request for npm and GitHub Actions updates.
+
+`reportError()` in `src/lib/report-error.ts` is the only error-reporting call. Error screens and failed API requests use it. Point that function at Sentry when a project needs it.
 
 ## Layout
 

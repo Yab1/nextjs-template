@@ -24,3 +24,9 @@ jobs:
 
       - name: Check
         run: yarn check
+
+      - name: Install Playwright browser
+        run: yarn playwright install --with-deps chromium
+
+      - name: Smoke test
+        run: yarn test:e2e

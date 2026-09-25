@@ -1,6 +1,7 @@
 import { type Endpoint, endpoints, publicEndpoints } from "@/lib/api/endpoints";
 import { ACCESS_EXPIRES_COOKIE } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
+import { reportError } from "@/lib/report-error";
 
 const REFRESH_BUFFER_SECONDS = 45;
 
@@ -113,7 +114,10 @@ export async function api<T>(path: Endpoint, options: RequestOptions = {}) {
       payload.message
         ? payload.message
         : "Request failed";
-    logger.error("Request failed", { path, status: response.status, message });
+    reportError(new Error(message), {
+      path,
+      status: response.status,
+    });
     throw new ApiError(message, response.status);
   }
 

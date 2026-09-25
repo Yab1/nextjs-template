@@ -42,3 +42,7 @@ if (upstream && !upstream.ok) {
 1. Add the key to `endpoints`, `backendEndpoints`, or both.
 2. Call it through `api()` or `callBackend()`.
 3. Mark browser routes that must not refresh the session in `publicEndpoints`.
+
+## Errors
+
+Report unexpected failures with `reportError()` from `src/lib/report-error.ts`. Do not call a vendor SDK from a component. A project replaces the body of `reportError()` when it picks Sentry or another service.
