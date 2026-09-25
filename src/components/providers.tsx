@@ -6,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
+import { ConnectionStatus } from "@/components/connection-status";
 import { ThemeState } from "@/components/theme/theme-context";
 import { ThemeCustomizer } from "@/components/theme/theme-customizer";
 import type { ThemeSelection } from "@/config/theme";
@@ -31,6 +32,7 @@ export function Providers({
     >
       <ThemeState initial={theme}>
         <QueryClientProvider client={queryClient}>
+          <ConnectionStatus />
           <div className="theme-frame min-h-screen">{children}</div>
           <ThemeCustomizer />
           <Toaster richColors closeButton />
