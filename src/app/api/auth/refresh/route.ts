@@ -5,6 +5,8 @@ import {
   readRefreshUser,
   setAccessCookie,
 } from "@/app/api/auth/session-cookie";
+import { callBackend, upstreamFailure } from "@/lib/api/backend";
+import { backendEndpoints } from "@/lib/api/endpoints";
 
 function safeNextPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
@@ -21,6 +23,11 @@ export async function POST() {
     );
   }
 
+  const upstream = await callBackend(backendEndpoints.refresh);
+  if (upstream && !upstream.ok) {
+    return clearAuthCookies(await upstreamFailure(upstream));
+  }
+
   return setAccessCookie(NextResponse.json({ user }), user);
 }
 
@@ -29,6 +36,13 @@ export async function GET(request: Request) {
   const user = await readRefreshUser();
 
   if (!user) {
+    return clearAuthCookies(
+      NextResponse.redirect(new URL("/login", request.url))
+    );
+  }
+
+  const upstream = await callBackend(backendEndpoints.refresh);
+  if (upstream && !upstream.ok) {
     return clearAuthCookies(
       NextResponse.redirect(new URL("/login", request.url))
     );

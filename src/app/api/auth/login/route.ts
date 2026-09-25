@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 import { sessionResponse } from "@/app/api/auth/session-cookie";
-import { env } from "@/env/server";
+import { callBackend, upstreamFailure } from "@/lib/api/backend";
+import { backendEndpoints } from "@/lib/api/endpoints";
 import { createFixtureSession } from "@/lib/auth/session";
 
 const loginSchema = z.object({
@@ -18,21 +19,12 @@ export async function POST(request: Request) {
     );
   }
 
-  if (env.API_URL) {
-    const upstream = await fetch(`${env.API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(parsed.data),
-      cache: "no-store",
-    });
+  const upstream = await callBackend(backendEndpoints.login, {
+    body: parsed.data,
+  });
+  if (upstream) {
     if (!upstream.ok) {
-      const body = (await upstream.json().catch(() => null)) as {
-        message?: string;
-      } | null;
-      return Response.json(
-        { message: body?.message ?? "Login failed" },
-        { status: upstream.status }
-      );
+      return upstreamFailure(upstream);
     }
     const session = (await upstream.json()) as { user: { email: string } };
     return sessionResponse(createFixtureSession(session.user.email));

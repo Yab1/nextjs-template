@@ -1,0 +1,44 @@
+---
+description: Next.js template project conventions — API calls go through the endpoint maps
+alwaysApply: true
+---
+
+# Project conventions
+
+Living rule for this repo. Add new sections here as conventions settle. Do not create a one-off rule for every topic unless it needs its own file and globs.
+
+## API calls
+
+Two maps in `src/lib/api/endpoints.ts`. Add a path to the map that owns it. Do not write a URL string at the call site.
+
+| Map | Host | Caller |
+|-----|------|--------|
+| `endpoints` | This Next app (`/api/...`) | Browser and client components via `api()` |
+| `backendEndpoints` | External API, prefixed with `API_URL` | Server route handlers via `callBackend()` |
+
+`API_URL` empty means no external API. `callBackend()` returns `null`. Keep the local behavior. Do not invent a user or a successful upstream response.
+
+### Browser
+
+```ts
+await api(endpoints.login, { method: "POST", body: values });
+```
+
+`api()` lives in `src/lib/api/client.ts`. That file is the only place that may `fetch` an `endpoints` path. Pass an `Endpoint` value, not a string.
+
+### Server, talking to the external API
+
+```ts
+const upstream = await callBackend(backendEndpoints.login, { body: parsed.data });
+if (upstream && !upstream.ok) {
+  return upstreamFailure(upstream);
+}
+```
+
+`callBackend()` and `backendUrl()` live in `src/lib/api/backend.ts`. That file is the only place that may join `API_URL` to a path.
+
+### Adding an endpoint
+
+1. Add the key to `endpoints`, `backendEndpoints`, or both.
+2. Call it through `api()` or `callBackend()`.
+3. Mark browser routes that must not refresh the session in `publicEndpoints`.
