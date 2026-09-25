@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { hasPermission } from "@/lib/auth/permissions";
-import { SESSION_COOKIE, parseSession } from "@/lib/auth/session";
+import { ACCESS_COOKIE, REFRESH_COOKIE, readToken } from "@/lib/auth/session";
 
 const publicPaths = new Set([
   "/",
@@ -19,20 +19,30 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = parseSession(request.cookies.get(SESSION_COOKIE)?.value);
+  const access = readToken(request.cookies.get(ACCESS_COOKIE)?.value, "access");
+  const refresh = readToken(
+    request.cookies.get(REFRESH_COOKIE)?.value,
+    "refresh"
+  );
   const isPublic = publicPaths.has(pathname);
 
-  if (!session && !isPublic) {
+  if (!access && refresh && !isPublic) {
+    const refreshUrl = new URL("/api/auth/refresh", request.url);
+    refreshUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(refreshUrl);
+  }
+
+  if (!access && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (session && (pathname === "/login" || pathname === "/register")) {
+  if (access && (pathname === "/login" || pathname === "/register")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   if (
     pathname.startsWith("/admin") &&
-    !hasPermission(session?.user.roles, "admin:view")
+    !hasPermission(access?.roles, "admin:view")
   ) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }

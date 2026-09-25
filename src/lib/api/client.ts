@@ -9,10 +9,41 @@ export class ApiError extends Error {
 
 type RequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
+  skipAuthRefresh?: boolean;
 };
 
+let refreshRequest: Promise<boolean> | null = null;
+
+function redirectToLogin() {
+  if (typeof window === "undefined") {
+    return;
+  }
+  if (window.location.pathname === "/login") {
+    return;
+  }
+  // Fetch helper sits outside React, so the router is not available here.
+  // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full navigation drops the expired session
+  window.location.assign("/login");
+}
+
+function refreshAccess() {
+  if (!refreshRequest) {
+    refreshRequest = fetch("/api/auth/refresh", {
+      method: "POST",
+      credentials: "include",
+      cache: "no-store",
+    })
+      .then((response) => response.ok)
+      .finally(() => {
+        refreshRequest = null;
+      });
+  }
+
+  return refreshRequest;
+}
+
 export async function api<T>(path: string, options: RequestOptions = {}) {
-  const { body, headers, ...rest } = options;
+  const { body, headers, skipAuthRefresh, ...rest } = options;
   const response = await fetch(path, {
     ...rest,
     credentials: "include",
@@ -23,6 +54,19 @@ export async function api<T>(path: string, options: RequestOptions = {}) {
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+
+  if (
+    response.status === 401 &&
+    !skipAuthRefresh &&
+    !path.startsWith("/api/auth/")
+  ) {
+    const refreshed = await refreshAccess();
+    if (refreshed) {
+      return api<T>(path, { ...options, skipAuthRefresh: true });
+    }
+    redirectToLogin();
+    throw new ApiError("Session expired", 401);
+  }
 
   const payload = (await response.json().catch(() => null)) as
     { message?: string } | T | null;

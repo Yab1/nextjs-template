@@ -1,5 +1,7 @@
-import { sessionResponse } from "@/app/api/auth/session-cookie";
+import { NextResponse } from "next/server";
+
+import { clearAuthCookies } from "@/app/api/auth/session-cookie";
 
 export async function POST() {
-  return sessionResponse(null);
+  return clearAuthCookies(NextResponse.json({ ok: true }));
 }
