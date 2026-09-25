@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.husky
+deploy/.env
+deploy/.active-slot
+deploy/nginx/app-active.conf
+deploy/nginx/app-active.conf.new
+*.md
+.vscode
+coverage

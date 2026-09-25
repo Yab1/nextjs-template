@@ -1,0 +1,48 @@
+name: nextjs_template
+
+x-app: &app
+  build:
+    context: ${DOCKER_BUILD_CONTEXT:-..}
+    dockerfile: deploy/Dockerfile
+  image: ${IMAGE_NAME:-nextjs_template:latest}
+  restart: unless-stopped
+  env_file:
+    - .env
+  networks:
+    - nextjs_template
+
+services:
+  nextjs_template_web_blue:
+    <<: *app
+    container_name: nextjs_template_web_blue
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  nextjs_template_web_green:
+    <<: *app
+    container_name: nextjs_template_web_green
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  nextjs_template_web_proxy:
+    image: nginx:1.27-alpine
+    container_name: nextjs_template_web_proxy
+    ports:
+      - "${APP_PORT:-3000}:80"
+    volumes:
+      - ./nginx/app-active.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    networks:
+      - nextjs_template
+
+networks:
+  nextjs_template:
+    name: nextjs_template
