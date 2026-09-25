@@ -1,9 +1,11 @@
 import Link from "next/link";
 
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
-import { createMetadata } from "@/lib/seo";
+import { definePageMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Forgot password" });
+export const generateMetadata = definePageMetadata({
+  title: "Forgot password",
+});
 
 export default function ForgotPasswordPage() {
   return (

@@ -20,3 +20,12 @@ export function createMetadata(input?: {
     },
   };
 }
+
+export function definePageMetadata(input?: {
+  title?: string;
+  description?: string;
+}) {
+  return async function generateMetadata() {
+    return createMetadata(input);
+  };
+}

@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { createMetadata } from "@/lib/seo";
+import { definePageMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Sign in" });
+export const generateMetadata = definePageMetadata({ title: "Sign in" });
 
 export default function LoginPage() {
   return (

@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-import { createMetadata } from "@/lib/seo";
+import { definePageMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({
+export const generateMetadata = definePageMetadata({
   title: "Home",
   description: "Next.js application template",
 });

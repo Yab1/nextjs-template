@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import { RegisterForm } from "@/components/auth/register-form";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { createMetadata } from "@/lib/seo";
+import { definePageMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Create account" });
+export const generateMetadata = definePageMetadata({ title: "Create account" });
 
 export default function RegisterPage() {
   return (

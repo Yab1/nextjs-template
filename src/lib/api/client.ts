@@ -1,5 +1,6 @@
 import { type Endpoint, endpoints, publicEndpoints } from "@/lib/api/endpoints";
 import { ACCESS_EXPIRES_COOKIE } from "@/lib/auth/session";
+import { logger } from "@/lib/logger";
 
 const REFRESH_BUFFER_SECONDS = 45;
 
@@ -74,6 +75,7 @@ export async function api<T>(path: Endpoint, options: RequestOptions = {}) {
   if (!skipAuthRefresh && !isPublic && accessExpiresSoon()) {
     const refreshed = await refreshAccess();
     if (!refreshed) {
+      logger.warn("Access token refresh failed", { path });
       redirectToLogin();
       throw new ApiError("Session expired", 401);
     }
@@ -95,6 +97,7 @@ export async function api<T>(path: Endpoint, options: RequestOptions = {}) {
     if (refreshed) {
       return api<T>(path, { ...options, skipAuthRefresh: true });
     }
+    logger.warn("Request unauthorized after refresh", { path, status: 401 });
     redirectToLogin();
     throw new ApiError("Session expired", 401);
   }
@@ -110,6 +113,7 @@ export async function api<T>(path: Endpoint, options: RequestOptions = {}) {
       payload.message
         ? payload.message
         : "Request failed";
+    logger.error("Request failed", { path, status: response.status, message });
     throw new ApiError(message, response.status);
   }
 

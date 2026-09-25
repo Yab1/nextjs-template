@@ -2,9 +2,11 @@ import { Suspense } from "react";
 
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { Skeleton } from "@/components/ui/skeleton";
-import { createMetadata } from "@/lib/seo";
+import { definePageMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Reset password" });
+export const generateMetadata = definePageMetadata({
+  title: "Reset password",
+});
 
 export default function ResetPasswordPage() {
   return (

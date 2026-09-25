@@ -1,6 +1,6 @@
-import { createMetadata } from "@/lib/seo";
+import { definePageMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Admin" });
+export const generateMetadata = definePageMetadata({ title: "Admin" });
 
 export default function AdminPage() {
   return (
