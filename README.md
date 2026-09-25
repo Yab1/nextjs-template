@@ -2,6 +2,8 @@
 
 Enterprise starting point for new Next.js apps. Next.js 16, React 19, TypeScript, Tailwind CSS 4.
 
+Every feature is listed in [FEATURES.md](FEATURES.md).
+
 ## Setup
 
 ```bash
