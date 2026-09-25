@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { Can } from "@/components/can";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useThemeSelection } from "@/components/theme/theme-context";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -29,6 +30,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const sidebarOpen = useUiStore((state) => state.sidebarOpen);
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  const { selection } = useThemeSelection();
+  const sidebar = selection.sidebar;
+  const horizontal = sidebar === "top" || sidebar === "bottom";
 
   async function logout() {
     await api(endpoints.logout, { method: "POST" });
@@ -38,9 +42,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div
+      className={`flex min-h-screen ${sidebar === "top" ? "flex-col" : ""} ${sidebar === "bottom" ? "flex-col-reverse" : ""} ${sidebar === "right" ? "flex-row-reverse" : ""}`}
+    >
       {sidebarOpen ? (
-        <aside className="border-border flex w-56 flex-col gap-3 border-r p-4">
+        <aside
+          className={`border-border flex gap-3 p-[var(--page-pad)] ${horizontal ? "flex-row items-center" : "w-56 flex-col"} ${sidebar === "left" ? "border-r" : ""} ${sidebar === "right" ? "border-l" : ""} ${sidebar === "top" ? "border-b" : ""} ${sidebar === "bottom" ? "border-t" : ""} ${selection.sidebarStyle === "floating" ? "m-3 rounded-[var(--radius)] border shadow-[var(--shadow)]" : ""} ${selection.sidebarStyle === "inset" ? "m-3 rounded-[var(--radius)] border" : ""}`}
+        >
           <Link className="font-semibold" href="/dashboard">
             App
           </Link>
@@ -104,7 +112,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Dialog>
           </div>
         </header>
-        <div className="flex-1 p-6">{children}</div>
+        <div className="flex-1 p-[var(--page-pad)]">{children}</div>
       </div>
     </div>
   );

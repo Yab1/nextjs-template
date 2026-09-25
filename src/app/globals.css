@@ -41,6 +41,80 @@
   --ring: #d4d4d8;
 }
 
+html[data-preset="blue"] {
+  --primary: #1d4ed8;
+  --primary-foreground: #eff6ff;
+  --ring: #1d4ed8;
+}
+
+html[data-preset="green"] {
+  --primary: #047857;
+  --primary-foreground: #ecfdf5;
+  --ring: #047857;
+}
+
+html[data-radius="none"] {
+  --radius: 0px;
+}
+html[data-radius="sm"] {
+  --radius: 0.25rem;
+}
+html[data-radius="md"] {
+  --radius: 0.5rem;
+}
+html[data-radius="lg"] {
+  --radius: 0.75rem;
+}
+
+html[data-scale="sm"] {
+  font-size: 14px;
+}
+html[data-scale="md"] {
+  font-size: 16px;
+}
+html[data-scale="lg"] {
+  font-size: 18px;
+}
+
+html[data-density="compact"] {
+  --page-pad: 0.75rem;
+}
+html[data-density="comfortable"] {
+  --page-pad: 1.5rem;
+}
+
+html[data-shadow="none"] {
+  --shadow: none;
+}
+html[data-shadow="sm"] {
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+html[data-shadow="md"] {
+  --shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+}
+
+html[data-contrast="high"] {
+  --foreground: #000000;
+  --border: #18181b;
+}
+
+html.dark[data-contrast="high"] {
+  --foreground: #ffffff;
+  --border: #fafafa;
+}
+
+html[data-font="geist"] body {
+  font-family: var(--font-geist), sans-serif;
+}
+html[data-font="inter"] body {
+  font-family: var(--font-inter), sans-serif;
+}
+
+html[data-content="compact"] .theme-frame {
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
