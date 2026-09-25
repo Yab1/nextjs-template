@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError, api } from "@/lib/api/client";
+import { endpoints } from "@/lib/api/endpoints";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -29,7 +30,7 @@ export function RegisterForm() {
 
   async function onSubmit(values: FormValues) {
     try {
-      await api("/api/auth/register", { method: "POST", body: values });
+      await api(endpoints.register, { method: "POST", body: values });
       router.push("/dashboard");
       router.refresh();
     } catch (error) {

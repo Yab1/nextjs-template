@@ -2,6 +2,7 @@ import type { Session, SessionUser } from "@/lib/auth/types";
 
 export const ACCESS_COOKIE = "access_token";
 export const REFRESH_COOKIE = "refresh_token";
+export const ACCESS_EXPIRES_COOKIE = "access_expires_at";
 
 export const ACCESS_TTL_SECONDS = 60 * 15;
 export const REFRESH_TTL_SECONDS = 60 * 60 * 24 * 7;

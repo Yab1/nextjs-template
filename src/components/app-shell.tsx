@@ -17,6 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/hooks/use-session";
 import { api } from "@/lib/api/client";
+import { endpoints } from "@/lib/api/endpoints";
 import { useUiStore } from "@/stores/ui-store";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -27,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
 
   async function logout() {
-    await api("/api/auth/logout", { method: "POST" });
+    await api(endpoints.logout, { method: "POST" });
     queryClient.clear();
     router.push("/login");
     router.refresh();

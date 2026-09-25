@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { env } from "@/env/server";
 import {
   ACCESS_COOKIE,
+  ACCESS_EXPIRES_COOKIE,
   ACCESS_TTL_SECONDS,
   REFRESH_COOKIE,
   REFRESH_TTL_SECONDS,
@@ -36,16 +37,26 @@ export async function readRefreshUser(): Promise<SessionUser | null> {
 export function clearAuthCookies(response: NextResponse) {
   response.cookies.set(ACCESS_COOKIE, "", cookieBase(0));
   response.cookies.set(REFRESH_COOKIE, "", cookieBase(0));
+  response.cookies.set(ACCESS_EXPIRES_COOKIE, "", cookieBase(0));
+  return response;
+}
+
+export function setAccessCookie(response: NextResponse, user: SessionUser) {
+  const expiresAt = Math.floor(Date.now() / 1000) + ACCESS_TTL_SECONDS;
+  response.cookies.set(
+    ACCESS_COOKIE,
+    createToken(user, "access", ACCESS_TTL_SECONDS),
+    cookieBase(ACCESS_TTL_SECONDS)
+  );
+  response.cookies.set(ACCESS_EXPIRES_COOKIE, String(expiresAt), {
+    ...cookieBase(ACCESS_TTL_SECONDS),
+    httpOnly: false,
+  });
   return response;
 }
 
 export function sessionResponse(session: Session) {
-  const response = NextResponse.json(session);
-  response.cookies.set(
-    ACCESS_COOKIE,
-    createToken(session.user, "access", ACCESS_TTL_SECONDS),
-    cookieBase(ACCESS_TTL_SECONDS)
-  );
+  const response = setAccessCookie(NextResponse.json(session), session.user);
   response.cookies.set(
     REFRESH_COOKIE,
     createToken(session.user, "refresh", REFRESH_TTL_SECONDS),

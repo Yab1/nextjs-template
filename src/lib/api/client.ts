@@ -1,3 +1,8 @@
+import { type Endpoint, endpoints, publicEndpoints } from "@/lib/api/endpoints";
+import { ACCESS_EXPIRES_COOKIE } from "@/lib/auth/session";
+
+const REFRESH_BUFFER_SECONDS = 45;
+
 export class ApiError extends Error {
   status: number;
 
@@ -26,9 +31,29 @@ function redirectToLogin() {
   window.location.assign("/login");
 }
 
+function accessExpiresSoon() {
+  if (typeof document === "undefined") {
+    return false;
+  }
+
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${ACCESS_EXPIRES_COOKIE}=([^;]*)`)
+  );
+  if (!match) {
+    return false;
+  }
+
+  const expiresAt = Number(decodeURIComponent(match[1]));
+  if (!Number.isFinite(expiresAt)) {
+    return false;
+  }
+
+  return expiresAt - Date.now() / 1000 <= REFRESH_BUFFER_SECONDS;
+}
+
 function refreshAccess() {
   if (!refreshRequest) {
-    refreshRequest = fetch("/api/auth/refresh", {
+    refreshRequest = fetch(endpoints.refresh, {
       method: "POST",
       credentials: "include",
       cache: "no-store",
@@ -42,8 +67,18 @@ function refreshAccess() {
   return refreshRequest;
 }
 
-export async function api<T>(path: string, options: RequestOptions = {}) {
+export async function api<T>(path: Endpoint, options: RequestOptions = {}) {
   const { body, headers, skipAuthRefresh, ...rest } = options;
+  const isPublic = publicEndpoints.has(path);
+
+  if (!skipAuthRefresh && !isPublic && accessExpiresSoon()) {
+    const refreshed = await refreshAccess();
+    if (!refreshed) {
+      redirectToLogin();
+      throw new ApiError("Session expired", 401);
+    }
+  }
+
   const response = await fetch(path, {
     ...rest,
     credentials: "include",
@@ -55,11 +90,7 @@ export async function api<T>(path: string, options: RequestOptions = {}) {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
-  if (
-    response.status === 401 &&
-    !skipAuthRefresh &&
-    !path.startsWith("/api/auth/")
-  ) {
+  if (response.status === 401 && !skipAuthRefresh && !isPublic) {
     const refreshed = await refreshAccess();
     if (refreshed) {
       return api<T>(path, { ...options, skipAuthRefresh: true });
